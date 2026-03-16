@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ECC vs RSA — Secure Demo</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;800&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+
+<body>
+    <div class="background-blobs">
+        <div class="blob blob1"></div>
+        <div class="blob blob2"></div>
+    </div>
+
+    <div class="app-container">
+        <header>
+            <h1><span class="ecc-text">ECC</span> <span class="vs-text">vs</span> <span class="rsa-text">RSA</span> Demo
+            </h1>
+            <p>Secure Communication Performance Visualizer</p>
+        </header>
+
+        <!-- Configuration Card -->
+        <div class="glass-panel">
+            <h2>Demo Configuration</h2>
+            <div class="input-group">
+                <label>Enter Message to Secure:</label>
+                <input type="text" id="plain-input" class="glass-input" placeholder="Type secret here..."
+                    value="Enter the text to be encrypted" maxlength="100">
+            </div>
+            <div id="error-banner"
+                style="display:none; background:rgba(239,68,68,0.2); border:1px solid #ef4444; border-radius:8px; padding:1rem; margin-bottom:1rem; color:#fca5a5;">
+            </div>
+            <button class="btn btn-primary" onclick="runCompleteDemo()">Run Full Demo</button>
+        </div>
+
+        <!-- 1. ECC Section -->
+        <div class="glass-panel" id="ecc-results" style="display:none">
+            <h2>1. ECC Performance (P-256)</h2>
+            <div class="animation-box">
+                <div class="actor">
+                    <div class="actor-emoji">👩‍💻</div>
+                    <b>Alice</b>
+                </div>
+                <div id="msgArrow" class="arrow">➡️</div>
+                <div class="actor">
+                    <div class="actor-emoji">👨‍💻</div>
+                    <b>Bob</b>
+                </div>
+            </div>
+            <p id="commStatus" style="text-align:center; color:var(--text-muted)">Establishing secure channel...</p>
+
+            <div class="result-cards">
+                <div class="card">
+                    <h3>ECC Encryption (Avg)</h3>
+                    <div class="time text-success" id="ecc-time">0.000 ms</div>
+                    <div class="detail">Curve: SECP256R1<br>Keysize: 256-bit</div>
+                </div>
+                <div class="card">
+                    <h3>ECDH Key Exchange</h3>
+                    <div id="ecdh-visual" style="text-align:left; font-size:0.8rem; color:var(--text-muted);">
+                        Alice Priv × Bob Pub ➔ <span id="shared-secret"
+                            style="color:var(--accent-green); word-break:break-all;">...</span><br>
+                        Time: <span id="ecdh-time" class="text-success">0.000 ms</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="grid-2">
+                <div>
+                    <label>Original Plaintext</label>
+                    <div class="code-display" id="ecies-plain-display">—</div>
+                    <label style="margin-top:10px">Encrypted Ciphertext (Base64)</label>
+                    <div class="code-display" id="ecies-ct" style="word-break:break-all;">—</div>
+                </div>
+                <div>
+                    <label>Decrypted Result</label>
+                    <div class="code-display" id="ecies-dec-out" style="color:var(--accent-green)">—</div>
+                </div>
+            </div>
+
+            <div style="margin-top:20px; background:rgba(0,0,0,0.2); padding:15px; border-radius:8px;">
+                <label>ECIES Encryption Flow</label>
+                <div class="code-display" style="text-align:center; color:var(--text-muted); padding:10px;">
+                    Plaintext ➔ ECC Encryption (ECIES) ➔ Ciphertext ➔ ECC Decryption ➔ Original Message
+                </div>
+            </div>
+        </div>
+
+        <!-- 2. RSA Section -->
+        <div class="glass-panel" id="rsa-results" style="display:none">
+            <h2>2. RSA Performance (2048-bit)</h2>
+            <div class="result-cards">
+                <div class="card">
+                    <h3>RSA Encryption (Avg)</h3>
+                    <div class="time text-purple" id="rsa-time">0.000 ms</div>
+                    <div class="detail">Process: Modular Exponentiation</div>
+                </div>
+                <div class="card">
+                    <h3>RSA Security</h3>
+                    <div class="detail" id="rsa-info">Standard 2048-bit RSA complexity (112-bit security).</div>
+                </div>
+            </div>
+
+            <div class="grid-2">
+                <div>
+                    <label>Original Message</label>
+                    <div class="code-display" id="rsa-plain-display">—</div>
+                    <label style="margin-top:10px">Encrypted Ciphertext</label>
+                    <div class="code-display" id="rsa-ct" style="word-break:break-all;">—</div>
+                </div>
+                <div>
+                    <label>Decrypted Message</label>
+                    <div class="code-display" id="rsa-dec-out" style="color:var(--accent-purple)">—</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 3. Final Comparison -->
+        <div class="glass-panel" id="bench-results" style="display:none">
+            <h2>3. Scientific Comparison</h2>
+            <div style="margin-bottom:20px; font-size:0.9rem; color:var(--text-muted); text-align:center;">
+                Academic Context: <strong>ECC 256-bit</strong> provides security equivalent to <strong>RSA
+                    3072-bit</strong>.<br>
+                ECC uses elliptic curve pairs for much smaller, faster keys at the same security level.
+            </div>
+            <canvas id="perfChart" height="150"></canvas>
+
+            <!-- ✅ Conclusion Section -->
+            <div id="conclusion-box" style="display:none; margin-top:2rem;">
+                <h3 style="font-size:1.2rem; margin-bottom:1rem; color:var(--text-main);">📝 Conclusion</h3>
+
+                <div style="display:grid; grid-template-columns:1fr 1fr; gap:1rem; margin-bottom:1.5rem;">
+                    <div
+                        style="background:rgba(16,185,129,0.1); border:1px solid rgba(16,185,129,0.4); border-radius:10px; padding:1rem;">
+                        <div style="font-size:0.75rem; color:var(--text-muted); margin-bottom:4px;">ECC KEY SIZE</div>
+                        <div style="font-size:1.4rem; font-weight:800; color:#10b981;">256-bit</div>
+                        <div style="font-size:0.8rem; color:var(--text-muted);">≡ RSA 3072-bit security</div>
+                    </div>
+                    <div
+                        style="background:rgba(139,92,246,0.1); border:1px solid rgba(139,92,246,0.4); border-radius:10px; padding:1rem;">
+                        <div style="font-size:0.75rem; color:var(--text-muted); margin-bottom:4px;">RSA KEY SIZE</div>
+                        <div style="font-size:1.4rem; font-weight:800; color:#a78bfa;">2048-bit</div>
+                        <div style="font-size:0.8rem; color:var(--text-muted);">112-bit security level</div>
+                    </div>
+                </div>
+
+                <div
+                    style="background:rgba(255,255,255,0.04); border-left:4px solid var(--accent-blue); border-radius:0 10px 10px 0; padding:1.2rem 1.5rem; font-size:0.95rem; line-height:1.8; color:var(--text-main);">
+                    ECC achieves equivalent security to RSA with significantly smaller key sizes
+                    (256-bit vs 3072-bit), resulting in faster key generation, lower memory usage,
+                    and reduced bandwidth — making it ideal for constrained environments such as
+                    <strong style="color:var(--accent-green);">IoT devices, mobile applications, and TLS
+                        handshakes</strong>.
+                    RSA encryption with a small public exponent (65537) can appear faster for raw
+                    encryption, but <strong style="color:var(--accent-purple);">ECC outperforms RSA in key generation
+                        and decryption</strong>,
+                    which are the most computationally expensive operations in real-world secure
+                    communication protocols.
+                </div>
+
+                <div style="display:grid; grid-template-columns:repeat(3,1fr); gap:0.8rem; margin-top:1.2rem;">
+                    <div
+                        style="background:rgba(0,0,0,0.2); border-radius:8px; padding:0.8rem; text-align:center; font-size:0.82rem;">
+                        <div style="font-size:1.2rem; margin-bottom:4px;">⚡</div>
+                        <div style="color:#10b981; font-weight:700;">Faster Key Gen</div>
+                        <div style="color:var(--text-muted);">ECC wins</div>
+                    </div>
+                    <div
+                        style="background:rgba(0,0,0,0.2); border-radius:8px; padding:0.8rem; text-align:center; font-size:0.82rem;">
+                        <div style="font-size:1.2rem; margin-bottom:4px;">🔑</div>
+                        <div style="color:#10b981; font-weight:700;">Smaller Keys</div>
+                        <div style="color:var(--text-muted);">12× smaller than RSA</div>
+                    </div>
+                    <div
+                        style="background:rgba(0,0,0,0.2); border-radius:8px; padding:0.8rem; text-align:center; font-size:0.82rem;">
+                        <div style="font-size:1.2rem; margin-bottom:4px;">📱</div>
+                        <div style="color:#10b981; font-weight:700;">IoT & Mobile</div>
+                        <div style="color:var(--text-muted);">ECC preferred</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API = "/api";
+        let flowState = { ecc: null, rsa: null, pt: "" };
+        let chart = null;
+
+        function showError(msg) {
+            const banner = document.getElementById('error-banner');
+            banner.textContent = "⚠️ " + msg;
+            banner.style.display = 'block';
+        }
+
+        function hideError() {
+            document.getElementById('error-banner').style.display = 'none';
+        }
+
+        async function safeFetch(url, body) {
+            try {
+                const res = await fetch(url, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(body)
+                });
+                const data = await res.json();
+                if (data.error) throw new Error(data.error);
+                return data;
+            } catch (err) {
+                showError(`API call to ${url} failed: ${err.message}`);
+                throw err;
+            }
+        }
+
+        async function runCompleteDemo() {
+            hideError();
+            const pt = document.getElementById('plain-input').value.trim();
+            if (!pt) { showError("Please enter a message to encrypt."); return; }
+            flowState.pt = pt;
+
+            try {
+                // 1. ECC Flow
+                document.getElementById('ecc-results').style.display = 'block';
+                document.getElementById('commStatus').textContent = "Alice is generating ephemeral keys...";
+
+                const kg = await safeFetch(`${API}/ecc/keygen`, { curve: 'P-256' });
+                const bobKg = await safeFetch(`${API}/ecc/keygen`, { curve: 'P-256' });
+
+                const ecdh = await safeFetch(`${API}/ecc/ecdh`, {
+                    private_key_pem: kg.private_key_pem,
+                    peer_public_key_pem: bobKg.public_key_pem
+                });
+
+                document.getElementById('shared-secret').textContent = ecdh.shared_secret_b64.substring(0, 32) + "...";
+                document.getElementById('ecdh-time').textContent = ecdh.elapsed_ms.toFixed(3) + " ms";
+
+                // ECC — 5-run average
+                let eccTotalTime = 0, lastEnc = null;
+                for (let i = 0; i < 5; i++) {
+                    const enc = await safeFetch(`${API}/ecc/encrypt`, {
+                        recipient_public_pem: kg.public_key_pem, plaintext: pt
+                    });
+                    eccTotalTime += enc.encrypt_time_ms;
+                    lastEnc = enc;
+                }
+                const eccAvg = eccTotalTime / 5;
+                flowState.ecc = lastEnc;
+
+                document.getElementById("msgArrow").style.transform = "translateX(50px)";
+                document.getElementById("commStatus").textContent = "Encrypted packet sent securely via ECIES!";
+                document.getElementById("ecies-plain-display").textContent = pt;
+                document.getElementById('ecies-ct').textContent = lastEnc.ciphertext_b64;
+                document.getElementById('ecc-time').textContent = eccAvg.toFixed(3) + " ms";
+
+                const dec = await safeFetch(`${API}/ecc/decrypt`, {
+                    recipient_private_pem: kg.private_key_pem,
+                    ephemeral_public_pem: lastEnc.ephemeral_public_pem,
+                    ciphertext_b64: lastEnc.ciphertext_b64,
+                    nonce_b64: lastEnc.nonce_b64,
+                    tag_b64: lastEnc.tag_b64,
+                    salt_b64: lastEnc.salt_b64
+                });
+                document.getElementById('ecies-dec-out').textContent = dec.plaintext;
+
+                // 2. RSA Flow
+                document.getElementById('rsa-results').style.display = 'block';
+                document.getElementById("rsa-plain-display").textContent = pt;
+
+                const rsaKg = await safeFetch(`${API}/rsa/keygen`, { key_size: 2048 });
+
+                let rsaTotalTime = 0, lastRsaEnc = null;
+                for (let i = 0; i < 5; i++) {
+                    const rsaEnc = await safeFetch(`${API}/rsa/encrypt`, {
+                        public_key_pem: rsaKg.public_key_pem, plaintext: pt
+                    });
+                    rsaTotalTime += rsaEnc.encrypt_time_ms;
+                    lastRsaEnc = rsaEnc;
+                }
+                const rsaAvg = rsaTotalTime / 5;
+
+                const rsaDec = await safeFetch(`${API}/rsa/decrypt`, {
+                    private_key_pem: rsaKg.private_key_pem,
+                    ciphertext_b64: lastRsaEnc.ciphertext_b64
+                });
+
+                flowState.rsa = lastRsaEnc;
+                document.getElementById('rsa-time').textContent = rsaAvg.toFixed(3) + " ms";
+                document.getElementById('rsa-ct').textContent = lastRsaEnc.ciphertext_b64;
+                document.getElementById('rsa-dec-out').textContent = rsaDec.plaintext;
+
+                // 3. Chart + Conclusion
+                document.getElementById('bench-results').style.display = 'block';
+                updatePerfChart(eccAvg, rsaAvg);
+                document.getElementById('conclusion-box').style.display = 'block';
+
+            } catch (err) {
+                console.error("Demo failed:", err);
+            }
+        }
+
+        function updatePerfChart(ecc, rsa) {
+            const ctx = document.getElementById('perfChart').getContext('2d');
+            if (chart) chart.destroy();
+            chart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['ECC Encryption (P-256)', 'RSA Encryption (2048)'],
+                    datasets: [{
+                        label: 'Avg Execution Time (ms)',
+                        data: [ecc, rsa],
+                        backgroundColor: ['rgba(16,185,129,0.6)', 'rgba(139,92,246,0.6)'],
+                        borderColor: ['#10b981', '#8b5cf6'],
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: { y: { beginAtZero: true }, x: { grid: { display: false } } },
+                    plugins: { legend: { display: false } }
+                }
+            });
+        }
+    </script>
+</body>
+
+</html>
