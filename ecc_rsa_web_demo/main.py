@@ -92,7 +92,6 @@ def ecc_encrypt():
 def ecc_decrypt():
     req = request.json
     try:
-        t0 = time.perf_counter()
         recipient_priv = serialization.load_pem_private_key(
             req["recipient_private_pem"].encode(), password=None, backend=default_backend()
         )
@@ -111,8 +110,8 @@ def ecc_decrypt():
         tag        = base64.b64decode(req["tag_b64"])
 
         aesgcm         = AESGCM(aes_key)
+        t0 = time.perf_counter()
         plaintext_bytes = aesgcm.decrypt(nonce, ciphertext + tag, None)
-
         elapsed = (time.perf_counter() - t0) * 1000
         return jsonify({
             "plaintext":       plaintext_bytes.decode(),

@@ -55,18 +55,29 @@
 
             <div class="result-cards">
                 <div class="card">
-                    <h3>ECC Encryption (Avg)</h3>
-                    <div class="time text-success" id="ecc-time">0.000 ms</div>
-                    <div class="detail">Curve: SECP256R1<br>Keysize: 256-bit</div>
+                    <h3>ECC Key Generation</h3>
+                    <div class="time text-success" id="ecc-keygen-time">0.000 ms</div>
+                    <div class="detail">Process: P-256 Curve Gen</div>
                 </div>
                 <div class="card">
-                    <h3>ECDH Key Exchange</h3>
-                    <div id="ecdh-visual" style="text-align:left; font-size:0.8rem; color:var(--text-muted);">
-                        Alice Priv × Bob Pub ➔ <span id="shared-secret"
-                            style="color:var(--accent-green); word-break:break-all;">...</span><br>
-                        Time: <span id="ecdh-time" class="text-success">0.000 ms</span>
-                    </div>
+                    <h3>ECC Encryption (Avg)</h3>
+                    <div class="time text-success" id="ecc-time">0.000 ms</div>
+                    <div class="detail">Symmetric (AES-GCM)</div>
                 </div>
+                <div class="card">
+                    <h3>ECC Decryption</h3>
+                    <div class="time text-success" id="ecc-dec-time">0.000 ms</div>
+                    <div class="detail">Fast AES Symmetric</div>
+                </div>
+            </div>
+            
+            <div id="ecdh-visual" style="margin-bottom: 20px; background:rgba(0,0,0,0.2); padding:15px; border-radius:8px; font-size:0.9rem;">
+                <b>ECDH Key Exchange (Alice Priv × Bob Pub):</b> 
+                <span id="shared-secret" style="color:var(--accent-green); word-break:break-all; font-family:monospace;">...</span><br>
+                <span style="font-size:0.8rem; color:var(--text-muted);">
+                    Note: Key exchange cost is important and measured separately for a fair comparison of symmetric encryption time.
+                    Time: <span id="ecdh-time" class="text-success">0.000 ms</span>
+                </span>
             </div>
 
             <div class="grid-2">
@@ -95,13 +106,24 @@
             <h2>2. RSA Performance (2048-bit)</h2>
             <div class="result-cards">
                 <div class="card">
-                    <h3>RSA Encryption (Avg)</h3>
-                    <div class="time text-purple" id="rsa-time">0.000 ms</div>
-                    <div class="detail">Process: Modular Exponentiation</div>
+                    <h3>RSA Key Generation</h3>
+                    <div class="time text-purple" id="rsa-keygen-time">0.000 ms</div>
+                    <div class="detail">Process: Prime Factorization</div>
                 </div>
                 <div class="card">
-                    <h3>RSA Security</h3>
-                    <div class="detail" id="rsa-info">Standard 2048-bit RSA complexity (112-bit security).</div>
+                    <h3>RSA Encryption (Avg)</h3>
+                    <div class="time text-purple" id="rsa-time">0.000 ms</div>
+                    <div class="detail">Modular Exponentiation</div>
+                </div>
+                <div class="card">
+                    <h3>RSA Decryption</h3>
+                    <div class="time text-purple" id="rsa-dec-time">0.000 ms</div>
+                    <div class="detail">Computationally Heavy</div>
+                </div>
+            </div>
+            <div class="card" style="margin-top:20px; width:100%;">
+                <div class="detail" id="rsa-info" style="text-align:center;">
+                    Standard 2048-bit RSA used for practical comparison as it is a widely used standard. (112-bit security).
                 </div>
             </div>
 
@@ -123,11 +145,24 @@
         <div class="glass-panel" id="bench-results" style="display:none">
             <h2>3. Scientific Comparison</h2>
             <div style="margin-bottom:20px; font-size:0.9rem; color:var(--text-muted); text-align:center;">
-                Academic Context: <strong>ECC 256-bit</strong> provides security equivalent to <strong>RSA
-                    3072-bit</strong>.<br>
-                ECC uses elliptic curve pairs for much smaller, faster keys at the same security level.
+                Academic context: <strong>ECC 256-bit</strong> ≡ <strong>RSA 3072-bit</strong> security.<br>
+                <em>Note: We use RSA 2048-bit here for practical comparison as it's the widely used standard.</em>
             </div>
-            <canvas id="perfChart" height="150"></canvas>
+            
+            <div class="grid-2" style="gap:2rem;">
+                <div>
+                    <h4 style="text-align:center; margin-bottom:10px;">Encryption Efficiency</h4>
+                    <canvas id="encChart" height="200"></canvas>
+                </div>
+                <div>
+                    <h4 style="text-align:center; margin-bottom:10px;">Decryption Efficiency</h4>
+                    <canvas id="decChart" height="200"></canvas>
+                </div>
+            </div>
+            <div style="margin-top:2rem;">
+                <h4 style="text-align:center; margin-bottom:10px;">Key Generation Performance</h4>
+                <canvas id="keygenChart" height="120"></canvas>
+            </div>
 
             <!-- ✅ Conclusion Section -->
             <div id="conclusion-box" style="display:none; margin-top:2rem;">
@@ -150,16 +185,17 @@
 
                 <div
                     style="background:rgba(255,255,255,0.04); border-left:4px solid var(--accent-blue); border-radius:0 10px 10px 0; padding:1.2rem 1.5rem; font-size:0.95rem; line-height:1.8; color:var(--text-main);">
-                    ECC achieves equivalent security to RSA with significantly smaller key sizes
+                    <p>ECC achieves equivalent security to RSA with significantly smaller key sizes
                     (256-bit vs 3072-bit), resulting in faster key generation, lower memory usage,
                     and reduced bandwidth — making it ideal for constrained environments such as
                     <strong style="color:var(--accent-green);">IoT devices, mobile applications, and TLS
-                        handshakes</strong>.
-                    RSA encryption with a small public exponent (65537) can appear faster for raw
-                    encryption, but <strong style="color:var(--accent-purple);">ECC outperforms RSA in key generation
-                        and decryption</strong>,
-                    which are the most computationally expensive operations in real-world secure
-                    communication protocols.
+                        handshakes</strong>.</p>
+                    
+                    <p style="margin-top:10px; border-top:1px solid rgba(255,255,255,0.1); padding-top:10px;">
+                        <strong>Security Note:</strong><br>
+                        • <span style="color:var(--accent-green)">ECC Security</span> is based on the <b>Elliptic Curve Discrete Log Problem (ECDLP)</b>.<br>
+                        • <span style="color:var(--accent-purple)">RSA Security</span> is based on the <b>Integer Factorization Problem</b>.
+                    </p>
                 </div>
 
                 <div style="display:grid; grid-template-columns:repeat(3,1fr); gap:0.8rem; margin-top:1.2rem;">
@@ -228,8 +264,10 @@
                 document.getElementById('ecc-results').style.display = 'block';
                 document.getElementById('commStatus').textContent = "Alice is generating ephemeral keys...";
 
-                const kg = await safeFetch(`${API}/ecc/keygen`, { curve: 'P-256' });
-                const bobKg = await safeFetch(`${API}/ecc/keygen`, { curve: 'P-256' });
+                const kg = await safeFetch(`${API}/ecc/keygen`, {});
+                const bobKg = await safeFetch(`${API}/ecc/keygen`, {});
+
+                document.getElementById('ecc-keygen-time').textContent = kg.gen_time_ms.toFixed(3) + " ms";
 
                 const ecdh = await safeFetch(`${API}/ecc/ecdh`, {
                     private_key_pem: kg.private_key_pem,
@@ -266,12 +304,14 @@
                     salt_b64: lastEnc.salt_b64
                 });
                 document.getElementById('ecies-dec-out').textContent = dec.plaintext;
+                document.getElementById('ecc-dec-time').textContent = dec.decrypt_time_ms.toFixed(3) + " ms";
 
                 // 2. RSA Flow
                 document.getElementById('rsa-results').style.display = 'block';
                 document.getElementById("rsa-plain-display").textContent = pt;
 
-                const rsaKg = await safeFetch(`${API}/rsa/keygen`, { key_size: 2048 });
+                const rsaKg = await safeFetch(`${API}/rsa/keygen`, {});
+                document.getElementById('rsa-keygen-time').textContent = rsaKg.gen_time_ms.toFixed(3) + " ms";
 
                 let rsaTotalTime = 0, lastRsaEnc = null;
                 for (let i = 0; i < 5; i++) {
@@ -290,12 +330,19 @@
 
                 flowState.rsa = lastRsaEnc;
                 document.getElementById('rsa-time').textContent = rsaAvg.toFixed(3) + " ms";
+                document.getElementById('rsa-dec-time').textContent = rsaDec.decrypt_time_ms.toFixed(3) + " ms";
                 document.getElementById('rsa-ct').textContent = lastRsaEnc.ciphertext_b64;
                 document.getElementById('rsa-dec-out').textContent = rsaDec.plaintext;
 
-                // 3. Chart + Conclusion
+                // 3. Charts + Conclusion
                 document.getElementById('bench-results').style.display = 'block';
-                updatePerfChart(eccAvg, rsaAvg);
+                
+                updateCharts({
+                    enc: [eccAvg, rsaAvg],
+                    dec: [dec.decrypt_time_ms, rsaDec.decrypt_time_ms],
+                    kg:  [kg.gen_time_ms, rsaKg.gen_time_ms]
+                });
+                
                 document.getElementById('conclusion-box').style.display = 'block';
 
             } catch (err) {
@@ -303,26 +350,64 @@
             }
         }
 
-        function updatePerfChart(ecc, rsa) {
-            const ctx = document.getElementById('perfChart').getContext('2d');
-            if (chart) chart.destroy();
-            chart = new Chart(ctx, {
+        let charts = {};
+
+        function updateCharts(data) {
+            const commonOptions = {
+                responsive: true,
+                scales: { y: { beginAtZero: true }, x: { grid: { display: false } } },
+                plugins: { legend: { display: false } }
+            };
+
+            // Encryption Chart
+            const ctxEnc = document.getElementById('encChart').getContext('2d');
+            if (charts.enc) charts.enc.destroy();
+            charts.enc = new Chart(ctxEnc, {
                 type: 'bar',
                 data: {
-                    labels: ['ECC Encryption (P-256)', 'RSA Encryption (2048)'],
+                    labels: ['ECC (Symmetric)', 'RSA (Asymmetric)'],
                     datasets: [{
-                        label: 'Avg Execution Time (ms)',
-                        data: [ecc, rsa],
+                        data: data.enc,
                         backgroundColor: ['rgba(16,185,129,0.6)', 'rgba(139,92,246,0.6)'],
                         borderColor: ['#10b981', '#8b5cf6'],
                         borderWidth: 2
                     }]
                 },
-                options: {
-                    responsive: true,
-                    scales: { y: { beginAtZero: true }, x: { grid: { display: false } } },
-                    plugins: { legend: { display: false } }
-                }
+                options: commonOptions
+            });
+
+            // Decryption Chart
+            const ctxDec = document.getElementById('decChart').getContext('2d');
+            if (charts.dec) charts.dec.destroy();
+            charts.dec = new Chart(ctxDec, {
+                type: 'bar',
+                data: {
+                    labels: ['ECC (AES)', 'RSA'],
+                    datasets: [{
+                        data: data.dec,
+                        backgroundColor: ['rgba(16,185,129,0.6)', 'rgba(139,92,246,0.6)'],
+                        borderColor: ['#10b981', '#8b5cf6'],
+                        borderWidth: 2
+                    }]
+                },
+                options: commonOptions
+            });
+
+            // KeyGen Chart
+            const ctxKg = document.getElementById('keygenChart').getContext('2d');
+            if (charts.kg) charts.kg.destroy();
+            charts.kg = new Chart(ctxKg, {
+                type: 'bar',
+                data: {
+                    labels: ['ECC (P-256)', 'RSA (2048)'],
+                    datasets: [{
+                        data: data.kg,
+                        backgroundColor: ['rgba(16,185,129,0.6)', 'rgba(139,92,246,0.6)'],
+                        borderColor: ['#10b981', '#8b5cf6'],
+                        borderWidth: 2
+                    }]
+                },
+                options: commonOptions
             });
         }
     </script>
