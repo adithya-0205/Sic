@@ -1,0 +1,298 @@
+% ============================================================
+%  ECC-Based Secure Communication and Performance Comparison with RSA
+%  Department of Computer Science and Engineering
+%  Rajagiri School of Engineering & Technology
+% ============================================================
+
+\documentclass[12pt, a4paper]{report}
+
+% ── Encoding & Fonts ──────────────────────────────────────
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{lmodern}
+\usepackage{microtype}
+
+% ── Page Layout ───────────────────────────────────────────
+\usepackage[
+  top=1in, bottom=1in,
+  left=1.25in, right=1in,
+  headheight=14pt
+]{geometry}
+
+% ── Colors ────────────────────────────────────────────────
+\usepackage[dvipsnames,svgnames,table]{xcolor}
+\definecolor{darkmaroon}{RGB}{20, 20, 20}
+\definecolor{accentblue}{RGB}{30, 80, 160}
+\definecolor{lightgray}{RGB}{245, 245, 245}
+\definecolor{codered}{RGB}{30, 80, 160}
+\definecolor{codegray}{RGB}{100, 100, 100}
+\definecolor{codegreen}{RGB}{0, 128, 0}
+\definecolor{rulecolor}{RGB}{80, 80, 80}
+
+% ── Typography ────────────────────────────────────────────
+\usepackage{setspace}
+\onehalfspacing
+
+% ── Headers & Footers ─────────────────────────────────────
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\fancyhf{}
+\renewcommand{\headrulewidth}{0.4pt}
+\renewcommand{\headrule}{\hbox to\headwidth{\color{darkmaroon}\leaders\hrule height \headrulewidth\hfill}}
+\fancyhead[L]{\small\textcolor{darkmaroon}{\textit{ECC vs RSA Performance Comparison}}}
+\fancyhead[R]{\small\textcolor{darkmaroon}{\textit{CSE, RSET}}}
+\fancyfoot[C]{\thepage}
+
+% ── Chapter / Section Styling ─────────────────────────────
+\usepackage{titlesec}
+
+\titleformat{\chapter}[display]
+  {\normalfont\Large\bfseries\color{darkmaroon}}
+  {}{0pt}
+  {\Huge\bfseries\color{darkmaroon}}
+  [\vspace{2pt}{\color{rulecolor}\titlerule[1.2pt]}]
+
+\titleformat{\section}
+  {\normalfont\large\bfseries\color{accentblue}}
+  {}{0em}{}
+
+\titleformat{\subsection}
+  {\normalfont\normalsize\bfseries\color{black}}
+  {}{0em}{}
+
+% Hide numbers from TOC entries too
+\setcounter{secnumdepth}{0}
+
+% ── Graphics & Figures ────────────────────────────────────
+\usepackage{graphicx}
+\usepackage{float}
+\usepackage{caption}
+\captionsetup{labelfont={bf,color=darkmaroon}, font=small}
+
+% ── Tables ────────────────────────────────────────────────
+\usepackage{booktabs}
+\usepackage{tabularx}
+\usepackage{array}
+\usepackage{multirow}
+\usepackage{longtable}
+
+% ── Code Listings ─────────────────────────────────────────
+\usepackage{listings}
+\lstset{
+  backgroundcolor=\color{lightgray},
+  basicstyle=\ttfamily\small,
+  keywordstyle=\color{accentblue}\bfseries,
+  commentstyle=\color{codegreen}\itshape,
+  stringstyle=\color{codered},
+  numberstyle=\tiny\color{codegray},
+  numbers=left,
+  numbersep=8pt,
+  stepnumber=1,
+  breaklines=true,
+  breakatwhitespace=false,
+  frame=single,
+  frameround=tttt,
+  rulecolor=\color{darkmaroon!30},
+  tabsize=4,
+  showspaces=false,
+  showstringspaces=false,
+  captionpos=b,
+  xleftmargin=15pt
+}
+
+% ── Hyperlinks ────────────────────────────────────────────
+\usepackage[
+  colorlinks=true,
+  linkcolor=darkmaroon,
+  urlcolor=accentblue,
+  citecolor=accentblue,
+  bookmarks=true,
+  bookmarksopen=true,
+  pdftitle={ECC vs RSA Performance Comparison — Project Report},
+  pdfauthor={CSE, RSET}
+]{hyperref}
+
+% ── Misc Utilities ────────────────────────────────────────
+\usepackage{enumitem}
+\usepackage{amsmath}
+\usepackage{amssymb}
+
+% ═══════════════════════════════════════════════════════════
+\begin{document}
+
+% ── Title Page ────────────────────────────────────────────
+\begin{titlepage}
+\centering
+\vspace*{0.5cm}
+
+{\fontsize{18}{22}\selectfont \textbf{\textcolor{darkmaroon}{SIC PROJECT REPORT}}}\\[1cm]
+{\fontsize{20}{24}\selectfont \textbf{\textcolor{darkmaroon}{ECC-BASED SECURE COMMUNICATION AND PERFORMANCE COMPARISON WITH RSA}}}\\[1.5cm]
+
+{\large \textit{by}}\\[0.8cm]
+
+\begin{tabular}{ll}
+  \large\textbf{Abraham Thomas Edakkara} & \large\textbf{(U2303014)} \\[0.25cm]
+  \large\textbf{Adithya Narayanan K P}   & \large\textbf{(U2303016)} \\[0.25cm]
+  \large\textbf{Akshay V X}              & \large\textbf{(U2303021)} \\[0.25cm]
+  \large\textbf{Amitha M M}              & \large\textbf{(U2303034)} \\
+\end{tabular}
+
+\vspace{2cm}
+
+{\large Submitted in partial fulfilment of the requirement \\ For the award of the degree of \\ \textbf{Bachelor of Technology}}
+
+\vspace{1.5cm}
+
+{\large \textbf{Department of Computer Science and Engineering}}\\[0.2cm]
+{\large \textbf{Rajagiri School of Engineering \& Technology}}\\[0.2cm]
+{\large \textbf{Rajagiri Valley P.O., Kakkanad, Kochi, Kerala -- 682039}}
+
+\vfill
+\end{titlepage}
+
+% ── Front Matter ──────────────────────────────────────────
+\pagenumbering{roman}
+
+% ── Acknowledgement ───────────────────────────────────────
+\chapter*{Acknowledgement}
+\addcontentsline{toc}{chapter}{Acknowledgement}
+
+\begin{onehalfspacing}
+We would like to express our heartfelt gratitude to all those who supported and guided us throughout the completion of this course project titled “ECC-Based Secure Communication and Performance Comparison with RSA.”
+
+We are deeply thankful to our course teacher, Miss Anita John, for her continuous support, valuable guidance, and constructive feedback. Her encouragement and insightful suggestions greatly contributed to our understanding of the subject and the successful completion of this project.
+
+We also extend our sincere thanks to Rajagiri School of Engineering & Technology for providing us with the opportunity and necessary resources to carry out this project. The academic environment and support offered by the institution played an important role in enhancing our learning experience.
+
+We would like to acknowledge the encouragement and understanding provided by our family and friends, whose constant support motivated us throughout the project.
+
+Finally, we express our special thanks to our project team members Akshay V X, Abraham Thomas Edakkara, Adithya Narayanan K P, and Amitha M M for their cooperation, shared ideas, and mutual support during every phase of the project. Working together as a team made this experience both productive and memorable.
+\end{onehalfspacing}
+
+\clearpage
+
+% ── Abstract ──────────────────────────────────────────────
+\chapter*{Abstract}
+\addcontentsline{toc}{chapter}{Abstract}
+
+\begin{onehalfspacing}
+In the modern digital era, secure communication plays a vital role in protecting sensitive information from unauthorized access. Cryptography provides the foundation for ensuring data confidentiality, integrity, and authentication in communication systems. Among various cryptographic techniques, asymmetric encryption algorithms such as Elliptic Curve Cryptography (ECC) and Rivest–Shamir–Adleman (RSA) are widely used.
+
+This project focuses on the implementation and performance comparison of ECC and RSA in a secure communication system. ECC is based on the Elliptic Curve Discrete Logarithm Problem, while RSA relies on the Integer Factorization Problem. Although both algorithms provide strong security, they differ significantly in terms of key size, efficiency, and computational performance.
+
+In this work, ECC was implemented using the SECP256R1 curve along with Elliptic Curve Diffie-Hellman (ECDH) key exchange, and RSA was implemented with a 2048-bit key size using OAEP padding. A hybrid encryption approach was also used by integrating AES-GCM for secure data transmission and HKDF with SHA-256 for key derivation.
+
+A backend system was developed using Flask to simulate secure communication and perform cryptographic operations. Performance evaluation was conducted by measuring key generation, encryption, and decryption times for both algorithms over multiple iterations. The results were analyzed and visualized using graphical tools to provide a clear comparison.
+
+The findings of this project demonstrate that ECC offers better efficiency and faster encryption and decryption compared to RSA, primarily due to its smaller key size. This makes ECC more suitable for modern applications such as mobile devices, IoT systems, and real-time communication environments.
+\end{onehalfspacing}
+
+\clearpage
+
+% ── Table of Contents ─────────────────────────────────────
+\tableofcontents
+\clearpage
+
+% ── Main Content ──────────────────────────────────────────
+\pagenumbering{arabic}
+\setcounter{page}{4}
+
+\chapter*{Chapter 1: Introduction}
+\addcontentsline{toc}{chapter}{Chapter 1: Introduction}
+
+Cryptography is a fundamental aspect of modern computer security that ensures safe and reliable communication over digital networks. With the exponential growth of the internet, online transactions, cloud computing, and communication platforms, the need for protecting sensitive data from unauthorized access has become more critical than ever.
+
+There are two main types of cryptographic systems: symmetric and asymmetric cryptography. Asymmetric cryptography plays a crucial role in secure communication systems, digital signatures, and key exchange protocols.
+
+Among the various asymmetric cryptographic algorithms, Elliptic Curve Cryptography (ECC) and Rivest–Shamir–Adleman (RSA) are widely used. RSA is based on the mathematical complexity of factoring large prime numbers. In contrast, ECC is based on the math of elliptic curves over finite fields. ECC offers the same level of security as RSA but with significantly smaller key sizes, such as 256 bits (equivalent to RSA 3072-bit).
+
+The main objective of this project is to implement both ECC and RSA algorithms and compare their performance in a secure communication environment.
+
+\chapter*{Chapter 2: Work Done}
+\addcontentsline{toc}{chapter}{Chapter 2: Work Done}
+
+The project was carried out systematically in multiple phases:
+
+\section{2.1 Study of Cryptographic Algorithms}
+Detailed study was conducted on RSA (Integer Factorization Problem) and ECC (Elliptic Curve Discrete Logarithm Problem).
+
+\section{2.2 Implementation of ECC}
+ECC was implemented using the SECP256R1 (P-256) curve. We used ECDH for key exchange and HKDF with SHA-256 to generate a symmetric key for AES-GCM encryption.
+
+\section{2.3 Implementation of RSA}
+RSA was implemented using a 2048-bit key size with OAEP padding.
+
+\section{2.4 System Development}
+A backend system was developed using the Flask framework to integrate both implementations and provide API endpoints for performance measurement.
+
+\section{2.5 Performance Testing}
+Operations were executed for 100 iterations. We recorded average, minimum, and maximum execution times using Python's \texttt{time.perf\_counter()}.
+
+\section{2.6 Visualization}
+Results were visualized using Chart.js to clearly show the efficiency differences.
+
+\chapter*{Chapter 3: Tools & Technologies Used}
+\addcontentsline{toc}{chapter}{Chapter 3: Tools & Technologies Used}
+
+\begin{itemize}[leftmargin=2em]
+  \item \textbf{Python}: Primary programming language.
+  \item \textbf{Cryptography Library}: Python's standard for secure math.
+  \item \textbf{Flask}: Lightweight web framework for the backend.
+  \item \textbf{AES-GCM}: Used for authenticated symmetric encryption.
+  \item \textbf{HKDF w/ SHA-256}: Key derivation from ECDH shared secrets.
+  \item \textbf{Chart.js}: Interactive performance visualization.
+  \item \textbf{time.perf\_counter()}: High-precision timing.
+\end{itemize}
+
+\chapter*{Chapter 4: Learning Outcomes}
+\addcontentsline{toc}{chapter}{Chapter 4: Learning Outcomes}
+
+We acquired deep technical knowledge in asymmetric cryptography, practical experience with Flask APIs, and improved our problem-solving skills by debugging complex encryption flows and key synchronization issues.
+
+\chapter*{Chapter 5: Challenges Faced}
+\addcontentsline{toc}{chapter}{Chapter 5: Challenges Faced}
+
+Challenges included the mathematical complexity of ECC, ensuring shared secret synchronization in ECDH, and handling nonce management in AES-GCM. These were overcome through iterative testing and debugging.
+
+\chapter*{Chapter 6: Conclusion}
+\addcontentsline{toc}{chapter}{Chapter 6: Conclusion}
+
+The project confirms that ECC represents a significant advancement over RSA, offering equivalent security with much smaller key sizes, leading to faster performance and lower resource usage.
+
+\chapter*{Appendix A}
+\addcontentsline{toc}{chapter}{Appendix A}
+
+\section{1. Results and Analysis}
+
+\begin{table}[H]
+\centering
+\caption{Performance Results (Average Time)}
+\label{tab:results}
+\renewcommand{\arraystretch}{1.5}
+\begin{tabularx}{\textwidth}{L X X}
+\toprule
+\textbf{Operation} & \textbf{ECC (Average Time)} & \textbf{RSA (Average Time)} \\
+\midrule
+Key Generation & 0.081 ms & 33.901 ms \\
+Encryption (Hybrid/OAEP) & 0.010 ms & 0.031 ms \\
+Decryption & 0.009 ms & 0.282 ms \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\section{2. System Architecture}
+The system consists of a Flask backend handling both ECC and RSA modules, providing a professional web UI to visualize performance in real-time.
+
+\section{3. Code Repository}
+GitHub Repository: \url{https://github.com/adithya-0205/Sic.git}
+
+\chapter*{References}
+\addcontentsline{toc}{chapter}{References}
+\begin{enumerate}
+  \item Rivest, R., Shamir, A., & Adleman, L. (1978). RSA.
+  \item Miller, V. (1985). Use of Elliptic Curves in Cryptography.
+  \item NIST SP 800-186 (2023). ECC Parameters.
+  \item RFC 5869: HKDF.
+\end{enumerate}
+
+\end{document}

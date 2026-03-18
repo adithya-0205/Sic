@@ -62,20 +62,23 @@
                 <div class="card">
                     <h3>ECC Encryption (Avg)</h3>
                     <div class="time text-success" id="ecc-time">0.000 ms</div>
-                    <div class="detail">Symmetric (AES-GCM)</div>
+                    <div class="detail">Hybrid (AES-GCM)</div>
                 </div>
                 <div class="card">
                     <h3>ECC Decryption</h3>
                     <div class="time text-success" id="ecc-dec-time">0.000 ms</div>
-                    <div class="detail">Fast AES Symmetric</div>
+                    <div class="detail">Fast Hybrid Decryption</div>
                 </div>
             </div>
-            
-            <div id="ecdh-visual" style="margin-bottom: 20px; background:rgba(0,0,0,0.2); padding:15px; border-radius:8px; font-size:0.9rem;">
-                <b>ECDH Key Exchange (Alice Priv × Bob Pub):</b> 
-                <span id="shared-secret" style="color:var(--accent-green); word-break:break-all; font-family:monospace;">...</span><br>
+
+            <div id="ecdh-visual"
+                style="margin-bottom: 20px; background:rgba(0,0,0,0.2); padding:15px; border-radius:8px; font-size:0.9rem;">
+                <b>ECDH Key Exchange (Alice Priv × Bob Pub):</b>
+                <span id="shared-secret"
+                    style="color:var(--accent-green); word-break:break-all; font-family:monospace;">...</span><br>
                 <span style="font-size:0.8rem; color:var(--text-muted);">
-                    Note: Key exchange cost is important and measured separately for a fair comparison of symmetric encryption time.
+                    Note: Key exchange cost is important and measured separately for a fair comparison of symmetric
+                    encryption time.
                     Time: <span id="ecdh-time" class="text-success">0.000 ms</span>
                 </span>
             </div>
@@ -123,7 +126,8 @@
             </div>
             <div class="card" style="margin-top:20px; width:100%;">
                 <div class="detail" id="rsa-info" style="text-align:center;">
-                    Standard 2048-bit RSA used for practical comparison as it is a widely used standard. (112-bit security).
+                    Standard 2048-bit RSA used for practical comparison as it is a widely used standard. (112-bit
+                    security).
                 </div>
             </div>
 
@@ -148,7 +152,7 @@
                 Academic context: <strong>ECC 256-bit</strong> ≡ <strong>RSA 3072-bit</strong> security.<br>
                 <em>Note: We use RSA 2048-bit here for practical comparison as it's the widely used standard.</em>
             </div>
-            
+
             <div class="grid-2" style="gap:2rem;">
                 <div>
                     <h4 style="text-align:center; margin-bottom:10px;">Encryption Efficiency</h4>
@@ -164,7 +168,7 @@
                 <canvas id="keygenChart" height="120"></canvas>
             </div>
 
-            <!-- ✅ Conclusion Section -->
+            <!-- Conclusion Section -->
             <div id="conclusion-box" style="display:none; margin-top:2rem;">
                 <h3 style="font-size:1.2rem; margin-bottom:1rem; color:var(--text-main);">📝 Conclusion</h3>
 
@@ -186,15 +190,18 @@
                 <div
                     style="background:rgba(255,255,255,0.04); border-left:4px solid var(--accent-blue); border-radius:0 10px 10px 0; padding:1.2rem 1.5rem; font-size:0.95rem; line-height:1.8; color:var(--text-main);">
                     <p>ECC achieves equivalent security to RSA with significantly smaller key sizes
-                    (256-bit vs 3072-bit), resulting in faster key generation, lower memory usage,
-                    and reduced bandwidth — making it ideal for constrained environments such as
-                    <strong style="color:var(--accent-green);">IoT devices, mobile applications, and TLS
-                        handshakes</strong>.</p>
-                    
+                        (256-bit vs 3072-bit), resulting in faster key generation, lower memory usage,
+                        and reduced bandwidth — making it ideal for constrained environments such as
+                        <strong style="color:var(--accent-green);">IoT devices, mobile applications, and TLS
+                            handshakes</strong>.
+                    </p>
+
                     <p style="margin-top:10px; border-top:1px solid rgba(255,255,255,0.1); padding-top:10px;">
                         <strong>Security Note:</strong><br>
-                        • <span style="color:var(--accent-green)">ECC Security</span> is based on the <b>Elliptic Curve Discrete Log Problem (ECDLP)</b>.<br>
-                        • <span style="color:var(--accent-purple)">RSA Security</span> is based on the <b>Integer Factorization Problem</b>.
+                        • <span style="color:var(--accent-green)">ECC Security</span> is based on the <b>Elliptic Curve
+                            Discrete Log Problem (ECDLP)</b>.<br>
+                        • <span style="color:var(--accent-purple)">RSA Security</span> is based on the <b>Integer
+                            Factorization Problem</b>.
                     </p>
                 </div>
 
@@ -202,20 +209,20 @@
                     <div
                         style="background:rgba(0,0,0,0.2); border-radius:8px; padding:0.8rem; text-align:center; font-size:0.82rem;">
                         <div style="font-size:1.2rem; margin-bottom:4px;">⚡</div>
-                        <div style="color:#10b981; font-weight:700;">Faster Key Gen</div>
-                        <div style="color:var(--text-muted);">ECC wins</div>
+                        <div id="keygen-winner-label" style="font-weight:700;">Faster Key Gen</div>
+                        <div id="keygen-winner-text" style="color:var(--text-muted)">—</div>
                     </div>
                     <div
                         style="background:rgba(0,0,0,0.2); border-radius:8px; padding:0.8rem; text-align:center; font-size:0.82rem;">
                         <div style="font-size:1.2rem; margin-bottom:4px;">🔑</div>
                         <div style="color:#10b981; font-weight:700;">Smaller Keys</div>
-                        <div style="color:var(--text-muted);">12× smaller than RSA</div>
+                        <div style="color:var(--text-muted)">12× smaller than RSA</div>
                     </div>
                     <div
                         style="background:rgba(0,0,0,0.2); border-radius:8px; padding:0.8rem; text-align:center; font-size:0.82rem;">
                         <div style="font-size:1.2rem; margin-bottom:4px;">📱</div>
                         <div style="color:#10b981; font-weight:700;">IoT & Mobile</div>
-                        <div style="color:var(--text-muted);">ECC preferred</div>
+                        <div style="color:var(--text-muted)">ECC preferred</div>
                     </div>
                 </div>
             </div>
@@ -336,13 +343,20 @@
 
                 // 3. Charts + Conclusion
                 document.getElementById('bench-results').style.display = 'block';
-                
+
                 updateCharts({
                     enc: [eccAvg, rsaAvg],
                     dec: [dec.decrypt_time_ms, rsaDec.decrypt_time_ms],
-                    kg:  [kg.gen_time_ms, rsaKg.gen_time_ms]
+                    kg: [kg.gen_time_ms, rsaKg.gen_time_ms]
                 });
-                
+
+                // ✅ Dynamic key generation winner — based on actual measured results
+                const keygenWinner = kg.gen_time_ms < rsaKg.gen_time_ms ? "ECC" : "RSA";
+                const keygenColor = keygenWinner === "ECC" ? "#10b981" : "#a78bfa";
+                document.getElementById('keygen-winner-label').style.color = keygenColor;
+                document.getElementById('keygen-winner-label').textContent = "Faster Key Gen";
+                document.getElementById('keygen-winner-text').textContent = keygenWinner + " wins";
+
                 document.getElementById('conclusion-box').style.display = 'block';
 
             } catch (err) {
@@ -365,7 +379,7 @@
             charts.enc = new Chart(ctxEnc, {
                 type: 'bar',
                 data: {
-                    labels: ['ECC (Symmetric)', 'RSA (Asymmetric)'],
+                    labels: ['ECC (Hybrid)', 'RSA (Asymmetric)'],
                     datasets: [{
                         data: data.enc,
                         backgroundColor: ['rgba(16,185,129,0.6)', 'rgba(139,92,246,0.6)'],
@@ -382,7 +396,7 @@
             charts.dec = new Chart(ctxDec, {
                 type: 'bar',
                 data: {
-                    labels: ['ECC (AES)', 'RSA'],
+                    labels: ['ECC (Hybrid-AES)', 'RSA'],
                     datasets: [{
                         data: data.dec,
                         backgroundColor: ['rgba(16,185,129,0.6)', 'rgba(139,92,246,0.6)'],

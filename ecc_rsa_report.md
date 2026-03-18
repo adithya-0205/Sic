@@ -111,9 +111,9 @@ We developed a robust benchmarking suite in the backend API to measure the real-
 | :--- | :--- | :--- | :--- |
 | **Security Level** | 128-bit | ~112-bit | ECC is stronger |
 | **Key Size** | 256 bits | 2048 bits | ECC is 8x smaller |
-| **Key Generation** | ✔ Fast (~0.2 ms) | ✔ Slow (~50 ms) | ECC is ~250x faster |
-| **Encryption** | ~0.25 ms (AES) | ~0.16 ms (Direct) | RSA is slightly faster |
-| **Decryption** | ✔ Very Fast (~0.05 ms) | ✔ Heavy (~60 ms) | ECC is ~1200x faster |
+| **Key Generation** | ✔ Fast (~0.08 ms) | ✔ Slow (~34 ms) | ECC is ~425x faster |
+| **Encryption** | ~0.01 ms (Hybrid-AES) | ~0.03 ms (Direct) | ECC is faster |
+| **Decryption** | ✔ Very Fast (~0.01 ms) | ✔ Heavy (~0.3 ms) | ECC is ~30x faster |
 | **Key Exchange** | ✔ Native (ECDH) | ❌ N/A | |
 | **Security Note** | <b>ECDLP</b> Basis | <b>Factorization</b> Basis | |
 
@@ -128,9 +128,9 @@ We developed a robust benchmarking suite in the backend API to measure the real-
 
 Our server-side benchmarks (running 5 iterations of each operation) yielded the following timing measurements:
 
-1.  **Key Generation Performance:** ECC P-256 key generation is practically instantaneous ($\approx 0.2 \text{ ms}$), while RSA 2048-bit key generation involves expensive prime number searching, taking significantly longer ($\approx 52 \text{ ms}$).
-2.  **Encryption Efficiency (Fair Timing):** For a fair comparison, we measure only the core encryption operation. RSA encryption with a small exponent is very fast ($\approx 0.16 \text{ ms}$), but ECC (using AES-GCM) is comparable ($\approx 0.25 \text{ ms}$).
-3.  **Decryption Performance:** This is where ECC (via AES) drastically outperforms RSA. ECC decryption takes $\approx 0.05 \text{ ms}$, while RSA decryption takes $\approx 61 \text{ ms}$, representing a 1200x speed advantage for ECC.
+1.  **Key Generation Performance:** ECC P-256 key generation is practically instantaneous ($\approx 0.08 \text{ ms}$), while RSA 2048-bit key generation involves expensive prime number searching, taking significantly longer ($\approx 34 \text{ ms}$).
+2.  **Encryption Efficiency (Fair Timing):** For a fair comparison, we measure only the core encryption operation. RSA encryption is fast ($\approx 0.03 \text{ ms}$), but ECC (using AES-GCM) is even faster ($\approx 0.01 \text{ ms}$).
+3.  **Decryption Performance:** ECC (via AES) drastically outperforms RSA. ECC decryption takes $\approx 0.01 \text{ ms}$, while RSA decryption takes $\approx 0.3 \text{ ms}$, representing a 30x speed advantage for ECC.
 4.  **Key Size & Security Equivalence:** The report confirms that **ECC 256-bit** provides security equivalent to **RSA 3072-bit**. We use **RSA 2048-bit** in our tests as it is the current practical industry standard, but it technically provides lower security (112-bit) than the ECC 256-bit used (128-bit).
 5.  **Bandwidth:** The ECC 256-bit public key requires only 65 bytes, whereas an RSA 2048-bit key requires 270+ bytes, making ECC ideal for low-bandwidth environments.
 7. **Technical Implementation Detail**: The performance benchmarks utilize Python's `time.perf_counter()` for high-precision timing, ensuring that the speed advantage of ECC is accurately captured even for microsecond-level operations.
